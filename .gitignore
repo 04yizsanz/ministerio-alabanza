@@ -1,0 +1,23 @@
+# Backend Laravel
+backend/.env
+backend/vendor/
+backend/node_modules/
+backend/storage/app/private/
+backend/storage/logs/
+backend/bootstrap/cache/
+
+# Frontend React/Vite
+frontend/node_modules/
+frontend/dist/
+frontend/.env.local
+frontend/.env.production
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/settings.json
+*.suo
+*.user

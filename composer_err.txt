@@ -1,0 +1,19 @@
+./composer.json has been updated
+Running composer update phpoffice/phpspreadsheet
+Loading composer repositories with package information
+Updating dependencies
+Lock file operations: 5 installs, 0 updates, 0 removals
+  - Locking composer/pcre (3.4.0)
+  - Locking maennchen/zipstream-php (3.2.2)
+  - Locking markbaker/complex (3.0.2)
+  - Locking markbaker/matrix (3.0.1)
+  - Locking phpoffice/phpspreadsheet (2.4.8)
+Writing lock file
+Installing dependencies from lock file (including require-dev)
+Package operations: 0 installs, 1 update, 0 removals
+  - Downloading maennchen/zipstream-php (3.2.2)
+  - Upgrading maennchen/zipstream-php (3.1.2 => 3.2.2): Extracting archive
+5 package suggestions were added by new dependencies, use `composer suggest` to see details.
+Generating optimized autoload files
+
+Installation failed, reverting ./composer.json and ./composer.lock to their original content.
