@@ -7,14 +7,18 @@ export const eventsService = {
   update:   (id, data)    => api.put(`/api/events/${id}`, data),
   archive:  (id)          => api.delete(`/api/events/${id}`),
   getTypes: ()            => api.get('/api/event-types'),
+
+  // Devuelve la URL de descarga (requiere que el backend maneje el auth via cookie)
+  excelUrl: (id)          => `/api/events/${id}/export/excel`,
 }
 
 export const blocksService = {
   // Bloques
-  getAll:  (eventId)       => api.get(`/api/events/${eventId}/blocks`),
-  create:  (eventId, data) => api.post(`/api/events/${eventId}/blocks`, data),
-  update:  (id, data)      => api.put(`/api/blocks/${id}`, data),
-  remove:  (id)            => api.delete(`/api/blocks/${id}`),
+  getAll:    (eventId)       => api.get(`/api/events/${eventId}/blocks`),
+  create:    (eventId, data) => api.post(`/api/events/${eventId}/blocks`, data),
+  update:    (id, data)      => api.put(`/api/blocks/${id}`, data),
+  remove:    (id)            => api.delete(`/api/blocks/${id}`),
+  duplicate: (id)            => api.post(`/api/blocks/${id}/duplicate`),
 
   // Canciones en bloque
   addSong:    (blockId, data) => api.post(`/api/blocks/${blockId}/songs`, data),

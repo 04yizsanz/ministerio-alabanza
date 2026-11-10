@@ -13,9 +13,6 @@ class EventTypeSeeder extends Seeder
             ['name' => 'Domingo',          'slug' => 'domingo',          'color' => '#e8003a'],
             ['name' => 'CDO',              'slug' => 'cdo',              'color' => '#7c3aed'],
             ['name' => 'Blaze',            'slug' => 'blaze',            'color' => '#ea580c'],
-            ['name' => 'Campamento',       'slug' => 'campamento',       'color' => '#16a34a'],
-            ['name' => 'Alborada',         'slug' => 'alborada',         'color' => '#ca8a04'],
-            ['name' => 'Ensayo',           'slug' => 'ensayo',           'color' => '#0284c7'],
             ['name' => 'Evento especial',  'slug' => 'evento-especial',  'color' => '#db2777'],
             ['name' => 'Otro',             'slug' => 'otro',             'color' => '#6b7280'],
         ];

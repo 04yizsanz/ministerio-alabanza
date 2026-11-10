@@ -6,23 +6,19 @@ import {
   Music2,
   Users,
   CalendarDays,
-  ClipboardList,
   Settings,
   LogOut,
   Menu,
   X,
-  ChevronDown,
 } from 'lucide-react'
 
 const navItems = [
-  { to: '/dashboard',  label: 'Dashboard',   icon: LayoutDashboard },
-  { to: '/songs',      label: 'Canciones',   icon: Music2 },
-  { to: '/people',     label: 'Integrantes', icon: Users },
-  { to: '/events',     label: 'Eventos',     icon: CalendarDays },
-  { to: '/schedules',  label: 'Programaciones', icon: ClipboardList },
+  { to: '/dashboard',  label: 'Dashboard',      icon: LayoutDashboard },
+  { to: '/songs',      label: 'Canciones',      icon: Music2 },
+  { to: '/people',     label: 'Integrantes',    icon: Users },
+  { to: '/events',     label: 'Eventos',        icon: CalendarDays },
   { to: '/settings',   label: 'Configuración',  icon: Settings },
 ]
-
 export default function AppLayout() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()

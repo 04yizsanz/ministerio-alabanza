@@ -22,3 +22,48 @@
     @apply bg-white rounded-xl shadow-sm border border-gray-100 p-6;
   }
 }
+
+/* ── Estilos de impresión ──────────────────────────────────────────────────── */
+@media print {
+  /* Ocultar todo excepto el área de la plantilla */
+  body > #root > * {
+    display: none !important;
+  }
+
+  /* Mostrar solo el área de impresión */
+  .print-area {
+    display: block !important;
+  }
+
+  /* Ocultar elementos marcados como no imprimibles */
+  .no-print {
+    display: none !important;
+  }
+
+  /* Quitar márgenes del body al imprimir */
+  body {
+    margin: 0;
+    padding: 0;
+    background: #fff;
+  }
+
+  /* Evitar cortes de página dentro de tablas */
+  table {
+    page-break-inside: auto;
+  }
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  /* Tamaño de página horizontal para CDO (más ancho) */
+  @page {
+    size: A4 landscape;
+    margin: 10mm;
+  }
+}
+
+/* Asegura que el área de impresión ocupe todo el espacio disponible en pantalla */
+.print-area {
+  width: 100%;
+}

@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Save } from 'lucide-react'
 import { eventsService } from '../../services/events'
 import Alert from '../../components/ui/Alert'
+import { useToast } from '../../context/ToastContext'
 import { parseValidationErrors } from '../../hooks/useApi'
 
 const empty = { event_type_id: '', name: '', start_date: '', end_date: '', description: '', status: 'draft', notes: '' }
@@ -10,6 +11,7 @@ const empty = { event_type_id: '', name: '', start_date: '', end_date: '', descr
 export default function EventFormPage() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { toast } = useToast()
   const isEditing = Boolean(id)
 
   const [form, setForm]       = useState(empty)
@@ -48,9 +50,11 @@ export default function EventFormPage() {
     try {
       if (isEditing) {
         await eventsService.update(id, form)
+        toast.success('Evento actualizado correctamente.')
         navigate(`/events/${id}`)
       } else {
         const { data } = await eventsService.create(form)
+        toast.success('Evento creado correctamente.')
         navigate(`/events/${data.id}`)
       }
     } catch (err) {

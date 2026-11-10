@@ -47,8 +47,11 @@ class AuthController extends Controller
     {
         Auth::guard('web')->logout();
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        // En contexto de tests de API no hay sesión disponible
+        if ($request->hasSession()) {
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
 
         return response()->json([
             'message' => 'Sesión cerrada correctamente.',

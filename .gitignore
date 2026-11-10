@@ -12,6 +12,10 @@ frontend/dist/
 frontend/.env.local
 frontend/.env.production
 
+# Docker / entorno
+.env
+*.env.local
+
 # Sistema operativo
 .DS_Store
 Thumbs.db
@@ -21,3 +25,9 @@ desktop.ini
 .vscode/settings.json
 *.suo
 *.user
+# Respaldos y archivos de diagnostico locales
+/ministerio-mysql-backup.tar.gz
+/composer_err.txt
+/migrate_out.txt
+
+/ministerio-mysql-backup.tar.gz

@@ -2,10 +2,10 @@ import { useEffect, useState, useRef } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import {
   ArrowLeft, Edit, Music2, FileText, Upload, Trash2,
-  Download, Eye, ChevronDown, ChevronUp, Plus, Save, X,
-  FileIcon, ImageIcon, AlertCircle
+  Download, ChevronDown, ChevronUp, Plus, Save, X, FileIcon
 } from 'lucide-react'
 import { songsService } from '../../services/songs'
+import api from '../../services/api'
 import Alert from '../../components/ui/Alert'
 import Spinner from '../../components/ui/Spinner'
 import { parseValidationErrors } from '../../hooks/useApi'
@@ -293,6 +293,22 @@ function CipherFilesSection({ songId }) {
     }
   }
 
+  const handleDownload = async (file) => {
+    try {
+      const response = await api.get(file.download_url, { responseType: 'blob' })
+      const url  = window.URL.createObjectURL(new Blob([response.data]))
+      const link = document.createElement('a')
+      link.href     = url
+      link.download = file.original_name
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(url)
+    } catch {
+      setError('No se pudo descargar el archivo.')
+    }
+  }
+
   if (loading) return <div className="flex justify-center py-8"><Spinner /></div>
 
   return (
@@ -389,15 +405,13 @@ function CipherFilesSection({ songId }) {
                 </p>
               </div>
               <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <a
-                  href={file.download_url}
-                  target="_blank"
-                  rel="noreferrer"
+                <button
+                  onClick={() => handleDownload(file)}
                   className="text-gray-400 hover:text-ministry-600 p-1.5 rounded hover:bg-ministry-50"
                   title="Descargar"
                 >
                   <Download className="w-4 h-4" />
-                </a>
+                </button>
                 <button
                   onClick={() => remove(file.id, file.original_name)}
                   className="text-gray-400 hover:text-red-500 p-1.5 rounded hover:bg-red-50"

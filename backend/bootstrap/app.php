@@ -25,12 +25,4 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
-        // Cualquier otro error → JSON cuando el cliente espera JSON
-        $exceptions->render(function (\Throwable $e, Request $request) {
-            if ($request->expectsJson() || $request->is('api/*')) {
-                $status = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : 500;
-                return response()->json(['message' => $e->getMessage()], $status);
-            }
-        });
-
     })->create();

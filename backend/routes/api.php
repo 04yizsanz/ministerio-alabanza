@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\PersonController;
 use App\Http\Controllers\Api\MusicalRoleController;
 use App\Http\Controllers\Api\EventController;
 use App\Http\Controllers\Api\ScheduleBlockController;
+use App\Http\Controllers\Api\ExportController;
 
 // ── Rutas públicas ──────────────────────────────────────────────────────
 Route::post('/login', [AuthController::class, 'login']);
@@ -67,5 +68,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('blocks/{block}/assignments/bulk',   [ScheduleBlockController::class, 'bulkAssignments']);
     Route::put('assignments/{assignment}',           [ScheduleBlockController::class, 'updateAssignment']);
     Route::delete('assignments/{assignment}',        [ScheduleBlockController::class, 'removeAssignment']);
+
+    // Duplicar bloque (copia canciones + líderes + asignaciones atómicamente)
+    Route::post('blocks/{block}/duplicate',          [ScheduleBlockController::class, 'duplicate']);
+
+    // ── Exportaciones ─────────────────────────────────────────────────────
+    Route::get('events/{event}/export/excel',        [ExportController::class, 'excel']);
 
 });

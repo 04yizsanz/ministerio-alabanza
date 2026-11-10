@@ -1,19 +1,114 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# Docker Compose — Sistema de Gestión del Ministerio de Alabanza
+#
+# Servicios:
+#   mysql        → Base de datos MySQL 8
+#   phpmyadmin   → Administrador web de MySQL  (http://localhost:8080)
+#   backend      → API Laravel               (http://localhost:8000)
+#   frontend     → SPA React (Nginx)         (http://localhost:5173)
+#
+# Para desarrollo local, solo levanta mysql y phpmyadmin:
+#   docker compose up -d mysql phpmyadmin
+#
+# Para producción completa:
+#   docker compose up -d
+# ──────────────────────────────────────────────────────────────────────────────
+
 services:
+
+  # ── Base de datos ────────────────────────────────────────────────────────────
   mysql:
     image: mysql:8.0
     container_name: ministerio-mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: ministerio_alabanza
-      MYSQL_USER: ministerio_user
-      MYSQL_PASSWORD: ministerio_pass
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE:      ${DB_DATABASE:-ministerio_alabanza}
+      MYSQL_USER:          ${DB_USERNAME:-ministerio_user}
+      MYSQL_PASSWORD:      ${DB_PASSWORD:-ministerio_pass}
     ports:
-      - "3306:3306"
+      - "${DB_PORT:-3306}:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-root}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Administrador de BD (solo desarrollo) ────────────────────────────────────
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: ministerio-phpmyadmin
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      PMA_HOST:     mysql
+      PMA_PORT:     3306
+      PMA_USER:     ${DB_USERNAME:-ministerio_user}
+      PMA_PASSWORD: ${DB_PASSWORD:-ministerio_pass}
+      UPLOAD_LIMIT: 64M
+    ports:
+      - "8080:80"
+    profiles:
+      - dev   # solo se levanta con: docker compose --profile dev up
+
+  # ── Backend Laravel ──────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ministerio-backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      APP_ENV:      ${APP_ENV:-production}
+      APP_KEY:      ${APP_KEY}
+      APP_DEBUG:    ${APP_DEBUG:-false}
+      APP_URL:      ${APP_URL:-http://localhost:8000}
+      DB_CONNECTION: mysql
+      DB_HOST:      mysql
+      DB_PORT:      3306
+      DB_DATABASE:  ${DB_DATABASE:-ministerio_alabanza}
+      DB_USERNAME:  ${DB_USERNAME:-ministerio_user}
+      DB_PASSWORD:  ${DB_PASSWORD:-ministerio_pass}
+      SESSION_DRIVER:   file
+      CACHE_STORE:      file
+      SANCTUM_STATEFUL_DOMAINS: ${SANCTUM_STATEFUL_DOMAINS:-localhost:5173}
+    ports:
+      - "8000:8000"
+    volumes:
+      - storage_data:/var/www/html/storage/app
+      - logs_data:/var/www/html/storage/logs
+    profiles:
+      - prod
+
+  # ── Frontend React (Nginx) ───────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ministerio-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+    profiles:
+      - prod
 
 volumes:
   mysql_data:
-    driver: local
+    external: true
+    name: ministerio-alabanza_mysql_data
+
+  storage_data:
+  logs_data:

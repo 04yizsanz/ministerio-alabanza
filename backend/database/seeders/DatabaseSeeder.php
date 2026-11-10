@@ -12,8 +12,8 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
             EventTypeSeeder::class,
             MusicalRoleSeeder::class,
-            // SongSeeder::class,      // se agregará después con canciones de prueba
-            // PersonSeeder::class,    // se agregará después con integrantes de prueba
+            SongSeeder::class,
+            PersonSeeder::class,
         ]);
     }
 }

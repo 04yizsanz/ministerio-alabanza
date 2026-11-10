@@ -218,6 +218,73 @@ class ScheduleBlockController extends Controller
     }
 
     /**
+     * POST /api/blocks/{block}/duplicate
+     * Duplica un bloque completo (canciones + líderes + asignaciones) de forma atómica.
+     */
+    public function duplicate(ScheduleBlock $block): JsonResponse
+    {
+        $newBlock = DB::transaction(function () use ($block) {
+            // Cargar relaciones si aún no están cargadas
+            $block->load([
+                'blockSongs.leaders',
+                'blockAssignments',
+            ]);
+
+            // 1. Crear bloque nuevo en el mismo evento
+            $sortOrder = $block->event->scheduleBlocks()->max('sort_order') + 1;
+
+            $newBlock = $block->event->scheduleBlocks()->create([
+                'name'               => $block->name . ' (copia)',
+                'block_date'         => $block->block_date,
+                'sort_order'         => $sortOrder,
+                'block_type'         => $block->block_type,
+                'estimated_duration' => $block->estimated_duration,
+                'notes'              => $block->notes,
+            ]);
+
+            // 2. Copiar canciones con sus líderes
+            foreach ($block->blockSongs as $bs) {
+                $newBs = $newBlock->blockSongs()->create([
+                    'song_id'           => $bs->song_id,
+                    'key_used'          => $bs->key_used,
+                    'bpm_used'          => $bs->bpm_used,
+                    'structure_notes'   => $bs->structure_notes,
+                    'performance_notes' => $bs->performance_notes,
+                    'sort_order'        => $bs->sort_order,
+                ]);
+
+                foreach ($bs->leaders as $leader) {
+                    $newBs->leaders()->create([
+                        'person_id'  => $leader->person_id,
+                        'role_label' => $leader->role_label,
+                    ]);
+                }
+            }
+
+            // 3. Copiar asignaciones de personas a funciones
+            foreach ($block->blockAssignments as $a) {
+                $newBlock->blockAssignments()->create([
+                    'musical_role_id' => $a->musical_role_id,
+                    'person_id'       => $a->person_id,
+                    'notes'           => $a->notes,
+                ]);
+            }
+
+            return $newBlock;
+        });
+
+        // Cargar relaciones para devolver el bloque completo
+        $newBlock->load([
+            'blockSongs.song',
+            'blockSongs.leaders.person',
+            'blockAssignments.musicalRole',
+            'blockAssignments.person',
+        ]);
+
+        return response()->json($newBlock, 201);
+    }
+
+    /**
      * POST /api/blocks/{block}/assignments/bulk
      * Reemplaza TODAS las asignaciones de un bloque en una sola operación.
      * Útil para guardar el estado completo del editor de programación.

@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, Save } from 'lucide-react'
 import { songsService } from '../../services/songs'
 import Alert from '../../components/ui/Alert'
+import { useToast } from '../../context/ToastContext'
 import { parseValidationErrors } from '../../hooks/useApi'
 
 const KEYS = ['C','C#','Db','D','Eb','E','F','F#','Gb','G','Ab','A','Bb','B',
@@ -13,12 +14,12 @@ const empty = { title: '', artist: '', original_key: '', bpm: '', audio_url: '',
 export default function SongFormPage() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { toast } = useToast()
   const isEditing = Boolean(id)
 
   const [form, setForm]       = useState(empty)
   const [errors, setErrors]   = useState({})
   const [error, setError]     = useState('')
-  const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(isEditing)
 
@@ -54,11 +55,11 @@ export default function SongFormPage() {
     try {
       if (isEditing) {
         await songsService.update(id, payload)
-        setSuccess('Canción actualizada correctamente.')
+        toast.success('Canción actualizada correctamente.')
       } else {
         const { data } = await songsService.create(payload)
-        setSuccess('Canción registrada correctamente.')
-        setTimeout(() => navigate(`/songs/${data.id}`), 1200)
+        toast.success('Canción registrada correctamente.')
+        setTimeout(() => navigate(`/songs/${data.id}`), 400)
       }
     } catch (err) {
       if (err.response?.status === 422) {
@@ -84,8 +85,7 @@ export default function SongFormPage() {
         </h1>
       </div>
 
-      <Alert type="error"   message={error}   onClose={() => setError('')} />
-      <Alert type="success" message={success} onClose={() => setSuccess('')} />
+      <Alert type="error" message={error} onClose={() => setError('')} />
 
       <form onSubmit={handleSubmit} className="card space-y-4">
         {/* Título */}
